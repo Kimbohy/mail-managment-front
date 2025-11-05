@@ -1,0 +1,91 @@
+import { Inbox, Mail, Send } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MessageListItem } from "./message-list-item";
+import type { MailSummary } from "@/api/mail";
+
+interface MessageListProps {
+  currentMailbox: "INBOX" | "Sent";
+  onMailboxChange: (mailbox: "INBOX" | "Sent") => void;
+  messages: MailSummary[];
+  selectedId: string | null;
+  onSelectMessage: (id: string) => void;
+  loading: boolean;
+  unreadCount: number;
+}
+
+export function MessageList({
+  currentMailbox,
+  onMailboxChange,
+  messages,
+  selectedId,
+  onSelectMessage,
+  loading,
+  unreadCount,
+}: MessageListProps) {
+  return (
+    <aside className="flex w-80 flex-col border-r">
+      <Tabs
+        value={currentMailbox}
+        onValueChange={(value) => onMailboxChange(value as "INBOX" | "Sent")}
+        className="flex flex-col flex-1"
+      >
+        <div className="border-b px-4 py-3">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="INBOX" className="gap-2">
+              <Inbox className="size-4" />
+              Inbox
+              {currentMailbox === "INBOX" && unreadCount > 0 && (
+                <Badge variant="default" className="ml-1 h-5 px-1 text-xs">
+                  {unreadCount}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="Sent" className="gap-2">
+              <Send className="size-4" />
+              Sent
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <ScrollArea className="flex-1">
+          {loading && messages.length === 0 ? (
+            <div className="space-y-2 p-3">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-20 w-full" />
+              ))}
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <Mail className="mb-4 size-12 text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground">
+                {currentMailbox === "INBOX"
+                  ? "No messages in your inbox"
+                  : "No sent messages"}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-1 p-2 w-full">
+              {messages.map((message) => (
+                <MessageListItem
+                  key={message.id}
+                  message={message}
+                  selected={message.id === selectedId}
+                  onSelect={() => onSelectMessage(message.id)}
+                />
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+
+        <div className="border-t p-3">
+          <div className="text-xs text-muted-foreground">
+            {messages.length} message{messages.length === 1 ? "" : "s"} total
+          </div>
+        </div>
+      </Tabs>
+    </aside>
+  );
+}
