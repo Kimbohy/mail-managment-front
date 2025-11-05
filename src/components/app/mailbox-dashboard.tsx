@@ -5,17 +5,17 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { Mail, RefreshCw, LogOut, Edit3, Menu, X } from "lucide-react";
 import {
-  Mail,
-  RefreshCw,
-  LogOut,
-  Edit3,
-  AlertCircle,
-  CheckCircle2,
-  Menu,
-  X,
-} from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +33,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { handleApiFailure } from "@/lib/mail-utils";
+import { resolveErrorMessage } from "@/lib/api-errors";
 import type { SessionInfo } from "@/api/auth";
 import {
   deleteMessage,
@@ -48,6 +48,7 @@ import { MessageList } from "./message-list";
 import { MessageViewer } from "./message-viewer";
 import { ComposeDialog, type ComposeDraft } from "./compose-dialog";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { toast } from "sonner";
 
 interface MailboxDashboardProps {
   session: SessionInfo;
@@ -70,11 +71,11 @@ export function MailboxDashboard({
   const [detailLoading, setDetailLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
   const [logoutPending, setLogoutPending] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [composeDraft, setComposeDraft] = useState<ComposeDraft>({
     to: "",
     subject: "",
@@ -85,7 +86,6 @@ export function MailboxDashboard({
 
   const refreshMessages = useCallback(async () => {
     setListLoading(true);
-    setActionError(null);
     try {
       const data = await listMessages(sessionId, currentMailbox);
       setMessages(data);
@@ -99,7 +99,10 @@ export function MailboxDashboard({
         return data[0]?.id ?? null;
       });
     } catch (error) {
-      handleApiFailure(error, onSessionExpired, setActionError);
+      toast.error(resolveErrorMessage(error));
+      if (error instanceof Error && error.message.includes("401")) {
+        onSessionExpired();
+      }
     } finally {
       setListLoading(false);
     }
@@ -116,7 +119,6 @@ export function MailboxDashboard({
     }
     setDetail(null);
     setDetailLoading(true);
-    setActionError(null);
     getMessage(sessionId, selectedId, currentMailbox)
       .then((message) => {
         setDetail(message);
@@ -127,27 +129,32 @@ export function MailboxDashboard({
         );
       })
       .catch((error) => {
-        handleApiFailure(error, onSessionExpired, setActionError);
+        toast.error(resolveErrorMessage(error));
+        if (error instanceof Error && error.message.includes("401")) {
+          onSessionExpired();
+        }
       })
       .finally(() => setDetailLoading(false));
   }, [sessionId, selectedId, onSessionExpired, currentMailbox]);
-
-  useEffect(() => {
-    if (!infoMessage) {
-      return;
-    }
-    const timer = window.setTimeout(() => setInfoMessage(null), 4000);
-    return () => window.clearTimeout(timer);
-  }, [infoMessage]);
 
   const unreadCount = useMemo(
     () => messages.filter((message) => !message.seen).length,
     [messages]
   );
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteClick = (id: string) => {
+    setMessageToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!messageToDelete) return;
+
+    const id = messageToDelete;
+    setDeleteConfirmOpen(false);
+    setMessageToDelete(null);
     setDeletingId(id);
-    setActionError(null);
+
     try {
       await deleteMessage(sessionId, id, currentMailbox);
       setMessages((current) => {
@@ -168,9 +175,12 @@ export function MailboxDashboard({
       setDetail((currentDetail) =>
         currentDetail && currentDetail.id === id ? null : currentDetail
       );
-      setInfoMessage("Message deleted successfully");
+      toast.success("Message deleted successfully");
     } catch (error) {
-      handleApiFailure(error, onSessionExpired, setActionError);
+      toast.error(resolveErrorMessage(error));
+      if (error instanceof Error && error.message.includes("401")) {
+        onSessionExpired();
+      }
     } finally {
       setDeletingId(null);
     }
@@ -182,11 +192,10 @@ export function MailboxDashboard({
       return;
     }
     if (!composeDraft.to || !composeDraft.subject) {
-      setActionError("Recipient and subject are required.");
+      toast.error("Recipient and subject are required.");
       return;
     }
     setSending(true);
-    setActionError(null);
     try {
       const payload: SendMailPayload = {
         to: composeDraft.to,
@@ -194,12 +203,15 @@ export function MailboxDashboard({
         text: composeDraft.body,
       };
       await sendMail(sessionId, payload);
-      setInfoMessage("Email sent successfully");
+      toast.success("Email sent successfully");
       setComposeDraft({ to: "", subject: "", body: "" });
       setComposeOpen(false);
       void refreshMessages();
     } catch (error) {
-      handleApiFailure(error, onSessionExpired, setActionError);
+      toast.error(resolveErrorMessage(error));
+      if (error instanceof Error && error.message.includes("401")) {
+        onSessionExpired();
+      }
     } finally {
       setSending(false);
     }
@@ -306,24 +318,6 @@ export function MailboxDashboard({
           </div>
         </header>
 
-        {/* Alert notifications */}
-        {(actionError || infoMessage) && (
-          <div className="px-4 pt-4">
-            {actionError && (
-              <Alert variant="destructive" className="mb-3">
-                <AlertCircle className="size-4" />
-                <AlertDescription>{actionError}</AlertDescription>
-              </Alert>
-            )}
-            {infoMessage && (
-              <Alert className="mb-3 border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-100">
-                <CheckCircle2 className="size-4" />
-                <AlertDescription>{infoMessage}</AlertDescription>
-              </Alert>
-            )}
-          </div>
-        )}
-
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden relative">
           {/* Sidebar - hidden on mobile, overlay on tablet, normal on desktop */}
@@ -365,7 +359,7 @@ export function MailboxDashboard({
               loading={detailLoading}
               selectedId={selectedId}
               deletingId={deletingId}
-              onDelete={handleDelete}
+              onDelete={handleDeleteClick}
             />
           </main>
         </div>
@@ -379,6 +373,27 @@ export function MailboxDashboard({
           sending={sending}
           userEmail={session.email}
         />
+
+        <AlertDialog
+          open={deleteConfirmOpen}
+          onOpenChange={setDeleteConfirmOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Message?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this message? This action cannot
+                be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteConfirm}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </TooltipProvider>
   );
