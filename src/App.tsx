@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { LoginCard } from "@/components/app/login-card";
-import { MailboxDashboard } from "./components/app/mailbox-dashboard-v2";
+import { MailboxDashboard } from "./components/app/mailbox-dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveErrorMessage } from "@/lib/api-errors";
 import {

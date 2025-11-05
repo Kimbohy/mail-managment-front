@@ -22,23 +22,34 @@ export interface SendMailPayload {
   html?: string;
 }
 
-export async function listMessages(sessionId: string): Promise<MailSummary[]> {
-  return apiFetch("/mail/messages", {
+export async function listMessages(
+  sessionId: string,
+  mailbox?: string
+): Promise<MailSummary[]> {
+  const params = mailbox ? `?mailbox=${encodeURIComponent(mailbox)}` : "";
+  return apiFetch(`/mail/messages${params}`, {
     sessionId,
   });
 }
 
 export async function getMessage(
   sessionId: string,
-  id: string
+  id: string,
+  mailbox?: string
 ): Promise<MailDetail> {
-  return apiFetch(`/mail/messages/${id}`, {
+  const params = mailbox ? `?mailbox=${encodeURIComponent(mailbox)}` : "";
+  return apiFetch(`/mail/messages/${id}${params}`, {
     sessionId,
   });
 }
 
-export async function deleteMessage(sessionId: string, id: string) {
-  await apiFetch(`/mail/messages/${id}`, {
+export async function deleteMessage(
+  sessionId: string,
+  id: string,
+  mailbox?: string
+) {
+  const params = mailbox ? `?mailbox=${encodeURIComponent(mailbox)}` : "";
+  await apiFetch(`/mail/messages/${id}${params}`, {
     method: "DELETE",
     sessionId,
   });
