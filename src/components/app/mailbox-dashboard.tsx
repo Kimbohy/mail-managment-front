@@ -47,6 +47,7 @@ import {
 import { MessageList } from "./message-list";
 import { MessageViewer } from "./message-viewer";
 import { ComposeDialog, type ComposeDraft } from "./compose-dialog";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface MailboxDashboardProps {
   session: SessionInfo;
@@ -258,6 +259,8 @@ export function MailboxDashboard({
               </TooltipTrigger>
               <TooltipContent>Refresh inbox</TooltipContent>
             </Tooltip>
+
+            <ThemeToggle />
 
             <Tooltip>
               <TooltipTrigger asChild>
