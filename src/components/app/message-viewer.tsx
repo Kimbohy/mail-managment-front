@@ -51,25 +51,27 @@ export function MessageViewer({
 
   return (
     <>
-      <div className="flex items-center justify-between border-b px-6 py-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="size-10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b px-4 md:px-6 py-3 md:py-4 gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Avatar className="size-8 md:size-10 shrink-0">
             <AvatarFallback>{createAvatarFallback(detail.from)}</AvatarFallback>
           </Avatar>
-          <div>
-            <h2 className="font-semibold">
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold text-sm md:text-base truncate">
               {detail.subject || "(No subject)"}
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground truncate">
               {detail.from || "Unknown sender"}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="size-3" />
-            {formatDisplayDate(detail.date)}
+            <span className="hidden sm:inline">
+              {formatDisplayDate(detail.date)}
+            </span>
           </div>
           <Separator orientation="vertical" className="h-6" />
           <Tooltip>
@@ -89,23 +91,23 @@ export function MessageViewer({
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6">
-          <div className="mb-4 rounded-lg bg-muted/50 p-3 text-sm">
+        <div className="p-4 md:p-6">
+          <div className="mb-4 rounded-lg bg-muted/50 p-3 text-xs md:text-sm">
             <div className="grid gap-1">
               <div className="flex gap-2">
-                <span className="font-medium">From:</span>
-                <span className="text-muted-foreground">
+                <span className="font-medium shrink-0">From:</span>
+                <span className="text-muted-foreground truncate">
                   {detail.from || "Unknown"}
                 </span>
               </div>
               <div className="flex gap-2">
-                <span className="font-medium">To:</span>
-                <span className="text-muted-foreground">
+                <span className="font-medium shrink-0">To:</span>
+                <span className="text-muted-foreground truncate">
                   {detail.to || "Unknown"}
                 </span>
               </div>
               <div className="flex gap-2">
-                <span className="font-medium">Date:</span>
+                <span className="font-medium shrink-0">Date:</span>
                 <span className="text-muted-foreground">
                   {formatDisplayDate(detail.date)}
                 </span>
@@ -115,7 +117,7 @@ export function MessageViewer({
 
           {detail.snippet ? (
             <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+              <pre className="whitespace-pre-wrap font-sans text-xs md:text-sm leading-relaxed">
                 {detail.snippet}
               </pre>
             </div>

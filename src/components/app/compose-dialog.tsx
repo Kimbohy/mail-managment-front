@@ -39,10 +39,10 @@ export function ComposeDialog({
 }: ComposeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Message</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             Compose and send an email from {userEmail}
           </DialogDescription>
         </DialogHeader>
@@ -75,24 +75,29 @@ export function ComposeDialog({
             <Label htmlFor="compose-body">Message</Label>
             <Textarea
               id="compose-body"
-              rows={12}
+              rows={8}
               value={draft.body}
               onChange={(e) => onDraftChange("body", e.target.value)}
               placeholder="Write your message here..."
-              className="resize-none"
+              className="resize-none min-h-[200px]"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={sending}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={sending} className="gap-2">
+            <Button
+              type="submit"
+              disabled={sending}
+              className="gap-2 w-full sm:w-auto"
+            >
               <Send className="size-4" />
               {sending ? "Sending..." : "Send Email"}
             </Button>

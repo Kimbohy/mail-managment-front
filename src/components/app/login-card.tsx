@@ -32,13 +32,13 @@ export function LoginCard({ loading, error, onSubmit }: LoginCardProps) {
 
   return (
     <Card className="w-full max-w-md border-border/80">
-      <CardHeader className="px-6">
-        <CardTitle className="text-2xl">Mail Manager</CardTitle>
-        <CardDescription>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">Mail Manager</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">
           Sign in with your mailbox credentials to view and send emails.
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-6">
+      <CardContent className="px-4 sm:px-6">
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -65,7 +65,9 @@ export function LoginCard({ loading, error, onSubmit }: LoginCardProps) {
           {error && (
             <Alert variant="destructive">
               <AlertTitle>Unable to sign in</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription className="text-xs sm:text-sm">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
           <Button type="submit" className="w-full" disabled={loading}>

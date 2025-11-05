@@ -12,6 +12,8 @@ import {
   Edit3,
   AlertCircle,
   CheckCircle2,
+  Menu,
+  X,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -71,6 +73,7 @@ export function MailboxDashboard({
   const [actionError, setActionError] = useState<string | null>(null);
   const [logoutPending, setLogoutPending] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [composeDraft, setComposeDraft] = useState<ComposeDraft>({
     to: "",
     subject: "",
@@ -216,16 +219,30 @@ export function MailboxDashboard({
       <div className="flex h-screen flex-col bg-background">
         {/* Top Navigation Bar */}
         <header className="flex h-14 items-center justify-between border-b px-4">
-          <div className="flex items-center gap-3">
-            <Mail className="size-6 text-primary" />
-            <h1 className="text-lg font-semibold">Mail Manager</h1>
-            <Separator orientation="vertical" className="h-6" />
-            <span className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? (
+                <X className="size-5" />
+              ) : (
+                <Menu className="size-5" />
+              )}
+            </Button>
+
+            <Mail className="size-5 md:size-6 text-primary" />
+            <h1 className="text-base md:text-lg font-semibold">Mail Manager</h1>
+            <Separator orientation="vertical" className="hidden md:block h-6" />
+            <span className="hidden md:inline text-sm text-muted-foreground">
               {session.email}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -251,7 +268,7 @@ export function MailboxDashboard({
                   className="gap-2"
                 >
                   <Edit3 className="size-4" />
-                  Compose
+                  <span className="hidden sm:inline">Compose</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>New message</TooltipContent>
@@ -305,20 +322,39 @@ export function MailboxDashboard({
         )}
 
         {/* Main content area */}
-        <div className="flex flex-1 overflow-hidden">
-          <MessageList
-            currentMailbox={currentMailbox}
-            onMailboxChange={(mailbox) => {
-              setCurrentMailbox(mailbox);
-              setSelectedId(null);
-              setDetail(null);
-            }}
-            messages={messages}
-            selectedId={selectedId}
-            onSelectMessage={setSelectedId}
-            loading={listLoading}
-            unreadCount={unreadCount}
-          />
+        <div className="flex flex-1 overflow-hidden relative">
+          {/* Sidebar - hidden on mobile, overlay on tablet, normal on desktop */}
+          <div
+            className={cn(
+              "absolute md:relative inset-y-0 left-0 z-50 transition-transform duration-300 md:translate-x-0",
+              sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            )}
+          >
+            <MessageList
+              currentMailbox={currentMailbox}
+              onMailboxChange={(mailbox) => {
+                setCurrentMailbox(mailbox);
+                setSelectedId(null);
+                setDetail(null);
+              }}
+              messages={messages}
+              selectedId={selectedId}
+              onSelectMessage={(id) => {
+                setSelectedId(id);
+                setSidebarOpen(false);
+              }}
+              loading={listLoading}
+              unreadCount={unreadCount}
+            />
+          </div>
+
+          {/* Overlay for mobile sidebar */}
+          {sidebarOpen && (
+            <div
+              className="absolute inset-0 bg-black/50 z-40 md:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
 
           <main className="flex flex-1 flex-col">
             <MessageViewer

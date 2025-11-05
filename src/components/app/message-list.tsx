@@ -26,25 +26,26 @@ export function MessageList({
   unreadCount,
 }: MessageListProps) {
   return (
-    <aside className="flex w-80 flex-col border-r">
+    <aside className="flex w-full md:w-80 flex-col border-r bg-background h-full">
       <Tabs
         value={currentMailbox}
         onValueChange={(value) => onMailboxChange(value as "INBOX" | "Sent")}
         className="flex flex-col flex-1"
       >
-        <div className="border-b px-4 py-3">
+        <div className="border-b px-3 md:px-4 py-3">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="INBOX" className="gap-2">
-              <Inbox className="size-4" />
-              Inbox
+            <TabsTrigger value="INBOX" className="gap-2 text-xs md:text-sm">
+              <Inbox className="size-3 md:size-4" />
+              <span className="hidden sm:inline">Inbox</span>
+              <span className="sm:hidden">In</span>
               {currentMailbox === "INBOX" && unreadCount > 0 && (
                 <Badge variant="default" className="ml-1 h-5 px-1 text-xs">
                   {unreadCount}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="Sent" className="gap-2">
-              <Send className="size-4" />
+            <TabsTrigger value="Sent" className="gap-2 text-xs md:text-sm">
+              <Send className="size-3 md:size-4" />
               Sent
             </TabsTrigger>
           </TabsList>
