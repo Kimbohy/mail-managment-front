@@ -5,10 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageListItem } from "./message-list-item";
 import type { MailSummary } from "@/api/mail";
+import type { BoxType } from "@/lib/nuqs.parser";
 
 interface MessageListProps {
-  currentMailbox: "INBOX" | "Sent";
-  onMailboxChange: (mailbox: "INBOX" | "Sent") => void;
+  currentMailbox: BoxType;
+  onMailboxChange: (mailbox: BoxType) => void;
   messages: MailSummary[];
   selectedId: string | null;
   onSelectMessage: (id: string) => void;
@@ -29,7 +30,7 @@ export function MessageList({
     <aside className="flex w-full md:w-80 flex-col border-r bg-background h-full overflow-hidden">
       <Tabs
         value={currentMailbox}
-        onValueChange={(value) => onMailboxChange(value as "INBOX" | "Sent")}
+        onValueChange={(value) => onMailboxChange(value as BoxType)}
         className="flex flex-col h-full"
       >
         <div className="border-b px-3 md:px-4 py-3 shrink-0">
@@ -75,7 +76,7 @@ export function MessageList({
                   message={message}
                   selected={message.id === selectedId}
                   onSelect={() => onSelectMessage(message.id)}
-                  isSent={currentMailbox === "Sent"}
+                  isSent={currentMailbox === "SENT"}
                 />
               ))}
             </div>

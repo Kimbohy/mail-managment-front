@@ -68,6 +68,8 @@ import { ComposeDialog, type ComposeDraft } from "./compose-dialog";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useTheme } from "@/components/theme-provider";
 import { toast } from "sonner";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+import { mailBoxTypeParser, type BoxType } from "@/lib/nuqs.parser";
 
 interface MailboxDashboardProps {
   session: SessionInfo;
@@ -80,11 +82,15 @@ export function MailboxDashboard({
   onLogout,
   onSessionExpired,
 }: MailboxDashboardProps) {
-  const [currentMailbox, setCurrentMailbox] = useState<"INBOX" | "Sent">(
-    "INBOX"
+  const [currentMailbox, setCurrentMailbox] = useQueryState(
+    "mailbox",
+    mailBoxTypeParser.withDefault("INBOX" as BoxType)
   );
   const [messages, setMessages] = useState<MailSummary[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useQueryState(
+    "selectedId",
+    parseAsString
+  );
   const [detail, setDetail] = useState<MailDetail | null>(null);
   const [listLoading, setListLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -95,8 +101,14 @@ export function MailboxDashboard({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [searchQuery, setSearchQuery] = useQueryState(
+    "search",
+    parseAsString.withDefault("")
+  );
+  const [showUnreadOnly, setShowUnreadOnly] = useQueryState(
+    "unread",
+    parseAsBoolean.withDefault(false)
+  );
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [composeDraft, setComposeDraft] = useState<ComposeDraft>({
     to: "",
@@ -305,7 +317,7 @@ export function MailboxDashboard({
                     <Search className="size-4" />
                   </InputGroupAddon>
                   <InputGroupInput
-                    type="search"
+                    type="text"
                     placeholder="Search messages..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -367,7 +379,7 @@ export function MailboxDashboard({
                       <Search className="size-4" />
                     </InputGroupAddon>
                     <InputGroupInput
-                      type="search"
+                      type="text"
                       placeholder="Search messages..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
