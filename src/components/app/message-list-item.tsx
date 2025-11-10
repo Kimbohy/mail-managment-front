@@ -9,12 +9,14 @@ interface MessageListItemProps {
   message: MailSummary;
   selected: boolean;
   onSelect: () => void;
+  isSent: boolean;
 }
 
 export function MessageListItem({
   message,
   selected,
   onSelect,
+  isSent,
 }: MessageListItemProps) {
   return (
     <button
@@ -29,14 +31,18 @@ export function MessageListItem({
       <div className="flex items-start gap-3 w-full">
         <Avatar className="size-9 shrink-0">
           <AvatarFallback className="text-xs">
-            {createAvatarFallback(message.from)}
+            {isSent
+              ? createAvatarFallback(message.to)
+              : createAvatarFallback(message.from)}
           </AvatarFallback>
         </Avatar>
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center justify-between gap-2">
             <p className="truncate text-sm font-medium">
-              {message.from || "Unknown sender"}
+              {isSent
+                ? message.to || "Unknown recipient"
+                : message.from || "Unknown sender"}
             </p>
             {!message.seen && (
               <Badge variant="default" className="shrink-0 text-xs">

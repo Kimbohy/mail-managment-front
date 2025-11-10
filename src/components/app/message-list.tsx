@@ -26,13 +26,13 @@ export function MessageList({
   unreadCount,
 }: MessageListProps) {
   return (
-    <aside className="flex w-full md:w-80 flex-col border-r bg-background h-full">
+    <aside className="flex w-full md:w-80 flex-col border-r bg-background h-full overflow-hidden">
       <Tabs
         value={currentMailbox}
         onValueChange={(value) => onMailboxChange(value as "INBOX" | "Sent")}
-        className="flex flex-col flex-1"
+        className="flex flex-col h-full"
       >
-        <div className="border-b px-3 md:px-4 py-3">
+        <div className="border-b px-3 md:px-4 py-3 shrink-0">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="INBOX" className="gap-2 text-xs md:text-sm">
               <Inbox className="size-3 md:size-4" />
@@ -51,7 +51,7 @@ export function MessageList({
           </TabsList>
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 min-h-0">
           {loading && messages.length === 0 ? (
             <div className="space-y-2 p-3">
               {[...Array(5)].map((_, i) => (
@@ -68,20 +68,21 @@ export function MessageList({
               </p>
             </div>
           ) : (
-            <div className="space-y-1 p-2 w-full">
+            <div className="space-y-2 p-2 w-full">
               {messages.map((message) => (
                 <MessageListItem
                   key={message.id}
                   message={message}
                   selected={message.id === selectedId}
                   onSelect={() => onSelectMessage(message.id)}
+                  isSent={currentMailbox === "Sent"}
                 />
               ))}
             </div>
           )}
         </ScrollArea>
 
-        <div className="border-t p-3">
+        <div className="border-t p-3 shrink-0">
           <div className="text-xs text-muted-foreground">
             {messages.length} message{messages.length === 1 ? "" : "s"} total
           </div>
