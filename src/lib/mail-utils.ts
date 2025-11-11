@@ -62,3 +62,29 @@ export function handleApiFailure(
   }
   setMessage(resolveErrorMessage(error));
 }
+
+/**
+ * Formats email addresses or names for display
+ * If the input start with a quote, it is the returned name is inly the part inside the quotes
+ * Otherwise, the input is returned as is
+ */
+export function formatDisplayName(nameOrEmail: string): string {
+  const quoteMatch = nameOrEmail.match(/^"(.*?)"/);
+  if (quoteMatch) {
+    return quoteMatch[1];
+  }
+  return nameOrEmail;
+}
+
+/**
+ * Format the subject line for display
+ * - If the subject is null or undefined, returns "(No subject)"
+ * - If the subject start with "Re: " or "Fwd: ", it is trimmed
+ * - Otherwise, the subject is returned as is
+ */
+export function formatSubject(subject: string | null | undefined): string {
+  if (!subject || subject.trim() === "") {
+    return "(No subject)";
+  }
+  return subject.replace(/^(Re: |Fwd: )/i, "").trim();
+}

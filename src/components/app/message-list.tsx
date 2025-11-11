@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageListItem } from "./message-list-item";
 import type { MailSummary } from "@/api/mail";
-import type { BoxType } from "@/lib/nuqs.parser";
+import type { BoxType } from "@/lib/nuqs-parser";
 
 interface MessageListProps {
   currentMailbox: BoxType;

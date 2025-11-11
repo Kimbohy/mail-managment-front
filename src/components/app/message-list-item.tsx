@@ -2,7 +2,12 @@ import { Clock } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { createAvatarFallback, formatDisplayDate } from "@/lib/mail-utils";
+import {
+  createAvatarFallback,
+  formatDisplayDate,
+  formatDisplayName,
+  formatSubject,
+} from "@/lib/mail-utils";
 import type { MailSummary } from "@/api/mail";
 
 interface MessageListItemProps {
@@ -18,6 +23,9 @@ export function MessageListItem({
   onSelect,
   isSent,
 }: MessageListItemProps) {
+  const emailFrom = formatDisplayName(message.from);
+  const emailTo = formatDisplayName(message.to);
+
   return (
     <button
       type="button"
@@ -32,8 +40,8 @@ export function MessageListItem({
         <Avatar className="size-9 shrink-0">
           <AvatarFallback className="text-xs">
             {isSent
-              ? createAvatarFallback(message.to)
-              : createAvatarFallback(message.from)}
+              ? createAvatarFallback(emailTo)
+              : createAvatarFallback(emailFrom)}
           </AvatarFallback>
         </Avatar>
 
@@ -41,8 +49,8 @@ export function MessageListItem({
           <div className="flex items-center justify-between gap-2">
             <p className="truncate text-sm font-medium">
               {isSent
-                ? message.to || "Unknown recipient"
-                : message.from || "Unknown sender"}
+                ? emailTo || "Unknown recipient"
+                : emailFrom || "Unknown sender"}
             </p>
             {!message.seen && (
               <Badge variant="default" className="shrink-0 text-xs">
@@ -52,7 +60,7 @@ export function MessageListItem({
           </div>
 
           <p className="truncate text-sm font-medium text-foreground">
-            {message.subject || "(No subject)"}
+            {formatSubject(message.subject)}
           </p>
 
           <p className="line-clamp-2 text-xs text-muted-foreground">
