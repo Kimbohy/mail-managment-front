@@ -45,7 +45,7 @@ export function MessageList({
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="Sent" className="gap-2 text-xs md:text-sm">
+            <TabsTrigger value="SENT" className="gap-2 text-xs md:text-sm">
               <Send className="size-3 md:size-4" />
               Sent
             </TabsTrigger>

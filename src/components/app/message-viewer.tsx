@@ -9,8 +9,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { createAvatarFallback, formatDisplayDate } from "@/lib/mail-utils";
+import {
+  createAvatarFallback,
+  formatDisplayDate,
+  formatSubject,
+} from "@/lib/mail-utils";
 import type { MailDetail } from "@/api/mail";
+import { formatDisplayName } from "../../lib/mail-utils";
 
 interface MessageViewerProps {
   detail: MailDetail | null;
@@ -54,11 +59,13 @@ export function MessageViewer({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b px-4 md:px-6 py-3 md:py-4 gap-3">
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <Avatar className="size-8 md:size-10 shrink-0">
-            <AvatarFallback>{createAvatarFallback(detail.from)}</AvatarFallback>
+            <AvatarFallback>
+              {createAvatarFallback(formatDisplayName(detail.from))}
+            </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <h2 className="font-semibold text-sm md:text-base truncate">
-              {detail.subject || "(No subject)"}
+              {formatSubject(detail.subject)}
             </h2>
             <p className="text-xs md:text-sm text-muted-foreground truncate">
               {detail.from || "Unknown sender"}
