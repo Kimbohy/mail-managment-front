@@ -122,10 +122,10 @@ export function MessageViewer({
             </div>
           </div>
 
-          {detail.snippet ? (
+          {detail.text ? (
             <div className="prose prose-sm max-w-none">
               <pre className="whitespace-pre-wrap font-sans text-xs md:text-sm leading-relaxed">
-                {detail.snippet}
+                {detail.text}
               </pre>
             </div>
           ) : detail.html ? (
@@ -133,6 +133,12 @@ export function MessageViewer({
               className="prose prose-sm max-w-none"
               dangerouslySetInnerHTML={{ __html: detail.html }}
             />
+          ) : detail.snippet ? (
+            <div className="prose prose-sm max-w-none">
+              <pre className="whitespace-pre-wrap font-sans text-xs md:text-sm leading-relaxed">
+                {detail.snippet}
+              </pre>
+            </div>
           ) : (
             <div className="flex items-center justify-center p-8 text-sm text-muted-foreground">
               No message content available
