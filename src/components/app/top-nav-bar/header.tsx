@@ -37,6 +37,7 @@ export default function Header({
   listLoading,
   refreshMessages,
   setComposeOpen,
+  onTrashClick,
 }: {
   onLogout: () => Promise<void>;
   sidebarOpen: boolean;
@@ -45,6 +46,7 @@ export default function Header({
   listLoading: boolean;
   refreshMessages: () => Promise<void>;
   setComposeOpen: any;
+  onTrashClick?: () => void;
 }) {
   const [searchQuery, setSearchQuery] = useQueryState(
     "search",
@@ -193,7 +195,11 @@ export default function Header({
                 <TooltipContent>Compose new email</TooltipContent>
               </Tooltip>
 
-              <UserDropdownMenu onLogout={onLogout} session={session} />
+              <UserDropdownMenu
+                onLogout={onLogout}
+                session={session}
+                onTrashClick={onTrashClick}
+              />
             </div>
           </>
         )}

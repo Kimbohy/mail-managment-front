@@ -1,4 +1,4 @@
-import { LogOut, User, Moon, Sun } from "lucide-react";
+import { LogOut, User, Moon, Sun, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +17,11 @@ import type { SessionInfo } from "@/api/auth";
 export default function UserDropdownMenu({
   onLogout,
   session,
+  onTrashClick,
 }: {
   onLogout: () => Promise<void>;
   session: SessionInfo;
+  onTrashClick?: () => void;
 }) {
   const [logoutPending, setLogoutPending] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -38,6 +40,15 @@ export default function UserDropdownMenu({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{session.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {onTrashClick && (
+          <>
+            <DropdownMenuItem onClick={onTrashClick}>
+              <Trash2 className="mr-2 size-4" />
+              Trash
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem
           onClick={() => {
             const newTheme =

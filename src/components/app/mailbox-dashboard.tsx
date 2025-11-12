@@ -46,10 +46,12 @@ export function MailboxDashboard({
 
   const {
     deletingId,
+    restoringId,
     deleteConfirmOpen,
     setDeleteConfirmOpen,
     handleDeleteClick,
     handleDeleteConfirm,
+    handleRestore,
   } = useMessageDelete({
     sessionId: session.sessionId,
     currentMailbox,
@@ -84,6 +86,12 @@ export function MailboxDashboard({
           setComposeOpen={setComposeOpen}
           refreshMessages={refreshMessages}
           listLoading={listLoading}
+          onTrashClick={() =>
+            handleMailboxChange("TRASH", () => {
+              setSelectedId(null);
+              setDetail(null);
+            })
+          }
         />
 
         {/* Main content area */}
@@ -112,6 +120,9 @@ export function MailboxDashboard({
               selectedId={selectedId}
               deletingId={deletingId}
               onDelete={handleDeleteClick}
+              isTrash={currentMailbox === "TRASH"}
+              onRestore={currentMailbox === "TRASH" ? handleRestore : undefined}
+              restoringId={restoringId}
             />
           </main>
         </div>
@@ -130,6 +141,7 @@ export function MailboxDashboard({
           deleteConfirmOpen={deleteConfirmOpen}
           setDeleteConfirmOpen={setDeleteConfirmOpen}
           handleDeleteConfirm={handleDeleteConfirm}
+          isTrash={currentMailbox === "TRASH"}
         />
       </div>
     </TooltipProvider>

@@ -13,25 +13,30 @@ export default function DeleteMessageDialog({
   deleteConfirmOpen,
   setDeleteConfirmOpen,
   handleDeleteConfirm,
+  isTrash = false,
 }: {
   deleteConfirmOpen: boolean;
   setDeleteConfirmOpen: (open: boolean) => void;
   handleDeleteConfirm: () => void;
+  isTrash?: boolean;
 }) {
   return (
     <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Message?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {isTrash ? "Delete Permanently?" : "Move to Trash?"}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this message? This action cannot be
-            undone.
+            {isTrash
+              ? "This message will be permanently deleted and cannot be recovered."
+              : "This message will be moved to trash. You can restore it later if needed."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleDeleteConfirm}>
-            Delete
+            {isTrash ? "Delete Permanently" : "Move to Trash"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

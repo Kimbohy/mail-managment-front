@@ -1,4 +1,4 @@
-import { Clock, Mail, Trash2 } from "lucide-react";
+import { Clock, Mail, Trash2, RotateCcw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,6 +23,9 @@ interface MessageViewerProps {
   selectedId: string | null;
   deletingId: string | null;
   onDelete: (id: string) => void;
+  onRestore?: (id: string) => void;
+  isTrash?: boolean;
+  restoringId?: string | null;
 }
 
 export function MessageViewer({
@@ -31,6 +34,9 @@ export function MessageViewer({
   selectedId,
   deletingId,
   onDelete,
+  onRestore,
+  isTrash = false,
+  restoringId,
 }: MessageViewerProps) {
   if (loading) {
     return (
@@ -81,19 +87,52 @@ export function MessageViewer({
             </span>
           </div>
           <Separator orientation="vertical" className="h-6" />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => selectedId && onDelete(selectedId)}
-                disabled={deletingId === selectedId}
-              >
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Delete message</TooltipContent>
-          </Tooltip>
+          {isTrash ? (
+            <>
+              {onRestore && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => selectedId && onRestore(selectedId)}
+                      disabled={restoringId === selectedId}
+                    >
+                      <RotateCcw className="size-4 text-primary" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Restore message</TooltipContent>
+                </Tooltip>
+              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => selectedId && onDelete(selectedId)}
+                    disabled={deletingId === selectedId}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete permanently</TooltipContent>
+              </Tooltip>
+            </>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => selectedId && onDelete(selectedId)}
+                  disabled={deletingId === selectedId}
+                >
+                  <Trash2 className="size-4 text-destructive" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Move to trash</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
 

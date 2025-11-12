@@ -55,6 +55,25 @@ export async function deleteMessage(
   });
 }
 
+export async function restoreMessage(
+  sessionId: string,
+  id: string,
+  targetMailbox: string
+) {
+  await apiFetch(`/mail/messages/${id}/restore`, {
+    method: "PUT",
+    sessionId,
+    body: JSON.stringify({ targetMailbox }),
+  });
+}
+
+export async function emptyTrash(sessionId: string) {
+  await apiFetch("/mail/trash", {
+    method: "DELETE",
+    sessionId,
+  });
+}
+
 export async function sendMail(sessionId: string, payload: SendMailPayload) {
   await apiFetch("/mail/send", {
     method: "POST",

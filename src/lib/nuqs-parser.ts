@@ -1,6 +1,6 @@
 import { createParser } from "nuqs";
 
-export type BoxType = "INBOX" | "SENT";
+export type BoxType = "INBOX" | "SENT" | "TRASH";
 
 export const mailBoxTypeParser = createParser({
   parse(value): BoxType {
